@@ -1,0 +1,41 @@
+const int numPads = 6;
+const int padPins[numPads] = {A0, A1, A2, A3, A4, A5};
+
+const int threshold = 550;                 // Trigger level
+const unsigned long lockoutTime = 500;     // Milliseconds to ignore after a valid step
+
+bool inCooldown[numPads] = {false};        // Is the pad in lockout?
+unsigned long lastStepTime[numPads] = {0}; // When the last step was detected
+
+void setup() {
+  Serial.begin(9600);
+  for (int i = 0; i < numPads; i++) {
+    pinMode(padPins[i], INPUT);
+  }
+}
+
+void loop() {
+  unsigned long now = millis();
+
+  for (int i = 0; i < numPads; i++) {
+    int sensorValue = analogRead(padPins[i]);
+
+    if (!inCooldown[i] && sensorValue > threshold) {
+      // Valid new step
+//      Serial.print("Footstep detected on Pad ");
+      Serial.write(i + 1);
+//      Serial.print(" | Value: ");
+//      Serial.println(sensorValue);
+
+      inCooldown[i] = true;
+      lastStepTime[i] = now;
+    }
+
+    // Reset cooldown after lockout time has passed
+    if (inCooldown[i] && (now - lastStepTime[i] >= lockoutTime)) {
+      inCooldown[i] = false;
+    }
+  }
+
+  delay(5);
+}
