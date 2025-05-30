@@ -1,0 +1,21 @@
+const int hallPins[6] = {2, 3, 4, 5, 6, 7};  // Pins for sensors
+int lastState[6] = {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH};  // Previous pin states
+
+void setup() {
+  Serial.begin(9600);
+  for (int i = 0; i < 6; i++) {
+    pinMode(hallPins[i], INPUT_PULLUP);  // Enable internal pull-up
+  }
+}
+
+void loop() {
+  for (int i = 0; i < 6; i++) {
+    int state = digitalRead(hallPins[i]);
+    if (lastState[i] == HIGH && state == LOW) {
+      // Detected a falling edge (magnet pass)
+      Serial.println(i + 1);  // Print 1 to 6
+      delay(50); // Simple debounce delay
+    }
+    lastState[i] = state;
+  }
+}
