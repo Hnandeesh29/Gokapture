@@ -1,41 +1,73 @@
 const int numPads = 6;
 const int padPins[numPads] = {A0, A1, A2, A3, A4, A5};
+const int ledPins[numPads] = {7, 6, 5, 4, 3, 2};  // LEDs mapped to respective pads
 
-const int threshold = 550;                 // Trigger level
-const unsigned long lockoutTime = 500;     // Milliseconds to ignore after a valid step
+const int threshold = 700;                 // Trigger level
+const unsigned long lockoutTime = 570;     // ms to ignore further input on a triggered pad
+const unsigned long ledOnTime = 100;       // ms LED stays on after triggering
 
-bool inCooldown[numPads] = {false};        // Is the pad in lockout?
-unsigned long lastStepTime[numPads] = {0}; // When the last step was detected
+bool inCooldown[numPads] = {false};        
+unsigned long lastStepTime[numPads] = {0}; 
+unsigned long ledTurnOffTime[numPads] = {0}; // LED auto-off timing
 
 void setup() {
   Serial.begin(9600);
+
   for (int i = 0; i < numPads; i++) {
     pinMode(padPins[i], INPUT);
+    pinMode(ledPins[i], OUTPUT);
+    digitalWrite(ledPins[i], LOW);
   }
 }
 
 void loop() {
   unsigned long now = millis();
 
+  // --- Check for Serial Reset Command ---
+  if (Serial.available()) {
+    char command = Serial.read();
+    if (command == 'r' || command == 'R') {
+      resetAll();
+    }
+  }
+
+  // --- Read and Process Pads ---
   for (int i = 0; i < numPads; i++) {
     int sensorValue = analogRead(padPins[i]);
 
     if (!inCooldown[i] && sensorValue > threshold) {
-      // Valid new step
-//      Serial.print("Footstep detected on Pad ");
-      Serial.write(i + 1);
-//      Serial.print(" | Value: ");
-//      Serial.println(sensorValue);
+      Serial.write(i + 1);  // Send pad number as byte (1–6)
 
+      // Trigger LED
+      digitalWrite(ledPins[i], HIGH);
+      ledTurnOffTime[i] = now + ledOnTime;
+
+      // Start cooldown
       inCooldown[i] = true;
       lastStepTime[i] = now;
     }
 
-    // Reset cooldown after lockout time has passed
+    // Reset cooldown if enough time has passed
     if (inCooldown[i] && (now - lastStepTime[i] >= lockoutTime)) {
       inCooldown[i] = false;
+    }
+
+    // Turn off LED if time expired
+    if (digitalRead(ledPins[i]) == HIGH && now >= ledTurnOffTime[i]) {
+      digitalWrite(ledPins[i], LOW);
     }
   }
 
   delay(5);
+}
+
+// --- Reset Function ---
+void resetAll() {
+  for (int i = 0; i < numPads; i++) {
+    inCooldown[i] = false;
+    lastStepTime[i] = 0;
+    digitalWrite(ledPins[i], LOW);
+    
+  }
+  Serial.println("Reset Done>>>>");
 }
