@@ -1,0 +1,54 @@
+#include <Adafruit_NeoPixel.h>
+
+const int numSensors = 6;
+
+const int hallPins[numSensors] = {2, 3, 4, 5, 6, 7};     // Hall sensor input pins
+const int neoPins[numSensors]  = {8, 9, 10, 11, 12, 13}; // NeoPixel data output pins
+
+const int ledsPerStrip = 20;  // Number of LEDs per NeoPixel strip
+
+// Create NeoPixel objects for each pin
+Adafruit_NeoPixel strips[numSensors] = {
+  Adafruit_NeoPixel(ledsPerStrip, 8, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 9, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 10, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 11, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 12, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 13, NEO_GRB + NEO_KHZ800),
+};
+
+void setup() {
+  Serial.begin(9600);
+
+  for (int i = 0; i < numSensors; i++) {
+    pinMode(hallPins[i], INPUT_PULLUP);  // Enable internal pull-up
+    strips[i].begin();
+    strips[i].show();  // All LEDs off initially
+  }
+}
+
+void loop() {
+  for (int i = 0; i < numSensors; i++) {
+    int sensorState = digitalRead(hallPins[i]);
+
+    if (sensorState == LOW) {  // Magnet detected
+      Serial.print("Sensor ");
+      Serial.print(i + 1);
+      Serial.println(" triggered");
+
+      // Turn ON LEDs in green
+      for (int j = 0; j < ledsPerStrip; j++) {
+        strips[i].setPixelColor(j, strips[i].Color(255, 150, 0)); // Green
+      }
+      strips[i].show();
+    } else {
+      // Turn OFF LEDs
+      for (int j = 0; j < ledsPerStrip; j++) {
+        strips[i].setPixelColor(j, 0); // Off
+      }
+      strips[i].show();
+    }
+  }
+
+  delay(50); // Small delay to avoid flickering
+}
