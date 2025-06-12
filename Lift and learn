@@ -2,19 +2,19 @@
 
 const int numSensors = 6;
 
-const int hallPins[numSensors] = {2, 3, 4, 5, 6, 7};     // Hall sensor input pins
-const int neoPins[numSensors]  = {8, 9, 10, 11, 12, 13}; // NeoPixel data output pins
+const int hallPins[numSensors] = {8, 9, 10, 11, 12, 13};     // Hall sensor input pins
+const int neoPins[numSensors]  = {2,3,4,5,6,7}; // NeoPixel data output pins
 
-const int ledsPerStrip = 20;  // Number of LEDs per NeoPixel strip
+const int ledsPerStrip = 50;  // Number of LEDs per NeoPixel strip
 
 // Create NeoPixel objects for each pin
 Adafruit_NeoPixel strips[numSensors] = {
-  Adafruit_NeoPixel(ledsPerStrip, 8, NEO_GRB + NEO_KHZ800),
-  Adafruit_NeoPixel(ledsPerStrip, 9, NEO_GRB + NEO_KHZ800),
-  Adafruit_NeoPixel(ledsPerStrip, 10, NEO_GRB + NEO_KHZ800),
-  Adafruit_NeoPixel(ledsPerStrip, 11, NEO_GRB + NEO_KHZ800),
-  Adafruit_NeoPixel(ledsPerStrip, 12, NEO_GRB + NEO_KHZ800),
-  Adafruit_NeoPixel(ledsPerStrip, 13, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 2, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 3, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 4, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 5, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 6, NEO_GRB + NEO_KHZ800),
+  Adafruit_NeoPixel(ledsPerStrip, 7, NEO_GRB + NEO_KHZ800),
 };
 
 void setup() {
