@@ -32,9 +32,9 @@ void loop() {
     int sensorState = digitalRead(hallPins[i]);
 
     if (sensorState == LOW) {  // Magnet detected
-      Serial.print("Sensor ");
-      Serial.print(i + 1);
-      Serial.println(" triggered");
+      //Serial.write("Sensor ");
+      Serial.write(i + 1);
+      //Serial.write(" triggered");
 
       // Turn ON LEDs in green
       for (int j = 0; j < ledsPerStrip; j++) {
